@@ -40,7 +40,7 @@ public class WorkerThread {
     	while(!this.isGameOver()) {
     		try {
 				Message message = (Message) this.ois.readObject();
-				//
+				// Code here
 				
 				
 			} catch (ClassNotFoundException e) {
@@ -57,7 +57,7 @@ public class WorkerThread {
             this.ous.writeObject(message);
             this.ous.flush();
         } catch (IOException e) {
-            //
+            // Code Here
         }
     }
     

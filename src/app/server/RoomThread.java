@@ -1,18 +1,109 @@
 package app.server;
 
-import java.net.Socket;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Set;
+
+import app.exceptions.ShipNotValidException;
+import app.game.Board;
+import app.game.Message;
+import app.game.Ship;
 
 public class RoomThread extends Thread {
-	private WorkerThread player1;
-	private WorkerThread player2;
-	private ServerThread serverThread;
+	private Hashtable<String, WorkerThread> players;
+	private Hashtable<String, Board> boards;
+	private Hashtable<String, Set<Ship>> ships;
 	private int playerCount;
 	private boolean gameOver;
 	private String winner;
 	
-	public RoomThread(WorkerThread player1, ServerThread serverThread) {
-		this.player1 = player1;
-		this.serverThread = serverThread;
+	public RoomThread(WorkerThread player1) {
+		this.players = new Hashtable<String, WorkerThread>();
+		this.boards = new Hashtable<String, Board>();
+		this.ships = new Hashtable<String, Set<Ship>>();
+	}
+	
+	public void attack(String attacker, String pos) {
+		
+		Board enemyBoard = null ;
+		Set<Ship> enemyShips = null;
+		String enemy = null;
+		
+		// iterate through all players
+    	Enumeration<String> usernames = this.players.keys();
+        while (usernames.hasMoreElements()) {
+            String username = usernames.nextElement();
+
+            WorkerThread wt = this.players.get(username);
+
+            // get board
+            if(!wt.getUsername().equals(attacker)) {
+            	enemy = wt.getUsername();
+            	enemyBoard = this.getBoard(wt.getUsername());
+            	enemyShips = this.getShips(wt.getUsername());
+            	break;
+            }
+        }
+
+        Iterator<Ship> shipIterator = enemyShips.iterator();
+        while (shipIterator.hasNext()) {
+        	Ship ship = shipIterator.next();
+        	
+        	if (ship.isHitShip(pos)) {
+        		ship.setShipCondition(pos, "X");
+        		enemyBoard.setBoardConditionAt(pos, "H");
+        		sendMessage(createMessage("Your ship at " + pos + " has been hitted", "Server", enemy));
+        		sendMessage(createMessage("Your missile hits the enemy ship", "Server", attacker));
+        		return;
+        	}
+        }
+        
+        enemyBoard.setBoardConditionAt(pos, "M");
+        sendMessage(createMessage("Enemy missile missed", "Server", enemy));
+        sendMessage(createMessage("Your missile missed", "Server", attacker));
+        
+	}
+	
+	public void addShip(String owner, int size, String start, String end) {
+		try {
+			Ship newShip = new Ship(size, start, end);
+			this.ships.get(owner).add(newShip);
+		} catch (ShipNotValidException e) {
+			sendMessage(createMessage(e.getMessage(), "Server", owner));
+		}
+	}
+	
+	public void sendMessage(Message message) {
+        
+		// iterate through all players
+    	Enumeration<String> usernames = this.players.keys();
+        while (usernames.hasMoreElements()) {
+            String username = usernames.nextElement();
+
+            WorkerThread wt = this.players.get(username);
+
+            // send the message to specified username
+            if(!wt.getUsername().equals(username)) {
+            	wt.send(message);
+            	break;
+            }
+        }
+    }
+	
+	public void createPlayer(WorkerThread player) {
+		players.put(player.getUsername(), player);
+		boards.put(player.getUsername(), new Board());
+		ships.put(player.getUsername(), new HashSet<Ship>());
+	}
+	
+	public Set<Ship> getShips(String username) {
+		return this.ships.get(username);
+	}
+	
+	public Board getBoard(String username) {
+		return this.boards.get(username);
 	}
 	
 	public boolean isGameOver() {
@@ -38,8 +129,11 @@ public class RoomThread extends Thread {
 	public void setGameOver(boolean gameOver) {
 		this.gameOver = gameOver;
 	}
-
-	public void setPlayer2(WorkerThread player2) {
-		this.player2 = player2;
+	
+	public Message createMessage(String message, String sender, String receiver) {
+		Message newMessage = new Message();
+		newMessage.setSender(sender);
+		newMessage.setReceiver(receiver);
+		return newMessage;
 	}
 }

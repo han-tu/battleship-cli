@@ -1,8 +1,10 @@
 package app.game;
 
+import java.util.Enumeration;
 import java.util.Hashtable;
 
 import app.exceptions.ShipNotValidException;
+import app.server.WorkerThread;
 
 public class Ship {
 	private int size;
@@ -27,13 +29,13 @@ public class Ship {
 		if (this.shipPositionType.equals("horizontal")) {
 			for (int i = 0 ; i < this.size ; i++) {
 				char posY = (char) (getVertical(start) + i);
-				shipCondition.put(posY + Integer.toString(getHorizontal(start)), "H");
+				shipCondition.put(posY + Integer.toString(getHorizontal(start)), "O");
 			}
 		}
 		else if (this.shipPositionType.equals("vertical")) {
 			for (int i = 0 ; i < this.size ; i++) {
 				char posY = (char) getVertical(start);
-				shipCondition.put(posY + Integer.toString(getHorizontal(start)), "H");
+				shipCondition.put(posY + Integer.toString(getHorizontal(start)), "O");
 			}
 		}
 	}
@@ -56,6 +58,19 @@ public class Ship {
 		
 		throw new ShipNotValidException("Ship position is not valid");
 		
+	}
+	
+	public boolean isHitShip(String checkPosition) {
+		// iterate through all players
+    	Enumeration<String> positions = this.shipCondition.keys();
+        while (positions.hasMoreElements()) {
+            String position = positions.nextElement();
+
+            if (position.equals(checkPosition)) {
+            	return true;
+            }
+        }
+        return false;
 	}
 	
 	private int getHorizontal(String pos) {

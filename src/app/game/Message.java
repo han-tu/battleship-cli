@@ -10,7 +10,6 @@ public class Message implements Serializable{
 	private String sender;			// Message Sender
 	private String receiver;		// Message Receiver
 	private String text;			// Message Text
-    private String request;			// Message Request Type
     
     /*
      * Request Type List:
@@ -19,10 +18,6 @@ public class Message implements Serializable{
      * 
      */
 
-    public Message(String request) {
-    	this.request = request;
-    }
-    
     public Message() {
     	
     }
@@ -50,12 +45,4 @@ public class Message implements Serializable{
     public void setReceiver(String receiver) {
     	this.receiver = receiver;
     }
-
-	public String getRequest() {
-		return request;
-	}
-
-	public void setRequest(String request) {
-		this.request = request;
-	}
 }
