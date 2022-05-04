@@ -5,14 +5,6 @@ import java.util.Hashtable;
 public class Board {
 	private Hashtable <String, String> boardMap;
 	
-	/*
-	 * Ship Count:
-	 * Small: 1
-	 * Medium-Small : 2
-	 * Medium-Large : 1
-	 * Large : 1
-	 */
-	
 	public Board() {
 		this.boardMap = new Hashtable<String, String>();
 		initBoardMap();
