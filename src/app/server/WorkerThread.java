@@ -77,32 +77,45 @@ public class WorkerThread extends Thread {
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
-				e.printStackTrace();
+				System.out.println("Player \"" + this.username + "\" has been disconnected");
+				break;
 			}
-
-		}
-	}
-
-	public void send(Message message) {
-		try {
-			this.ous.writeObject(message);
-			this.ous.flush();
-		} catch (IOException e) {
-			// Code Here
-		}
-	}
-
-	public String getUsername() {
-		return this.username;
-	}
-
-	public void setUsername(String username) {
-		this.username = username;
-	}
-
-	public Socket getSocket() {
-		return this.socket;
-	}
+    		
+    	}
+    }
+    
+    public String parseMessageText(String req) {
+    	int i = 0;
+    	String message = "";
+    	for (String token : req.split(" ")) {
+    		if (i != 0) {
+    			message += token + " ";
+    		}
+    		i++;
+    	}
+    	return message;
+    }
+    
+    public void send(Message message) {
+        try {
+            this.ous.writeObject(message);
+            this.ous.flush();
+        } catch (IOException e) {
+            // Code Here
+        }
+    }
+    
+    public String getUsername() {
+    	return this.username;
+    }
+    
+    public void setUsername(String username) {
+    	this.username = username;
+    }
+    
+    public Socket getSocket() {
+    	return this.socket;
+    }
 
 	public boolean isGameOver() {
 		return gameOver;

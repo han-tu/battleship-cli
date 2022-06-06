@@ -33,7 +33,8 @@ public class ServerThread extends Thread {
                 
                 // Disini kita bikin player nya
                 if (rt != null && rt.getPlayerCount() != 2) {
-                	rt.createPlayer(new WorkerThread(socket, rt));
+                	WorkerThread newWt = new WorkerThread(socket, rt);
+                	newWt.start();
                 }
                 // DIsini kita bikin room nya
                 else {                	

@@ -4,7 +4,6 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 
 import app.exceptions.ShipNotValidException;
-import app.server.WorkerThread;
 
 public class Ship {
 	private int size;

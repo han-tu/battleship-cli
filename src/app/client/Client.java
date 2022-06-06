@@ -64,6 +64,7 @@ public class Client {
 	public static void menu() {
 		System.out.println("---Request List Keyword (With CLI Command)---");
         System.out.println("> Send Message -> send-message <message text>");
+        System.out.println("> Add Ship -> add-ship <tile position>");
         System.out.println("> See My Board -> see -mb");
         System.out.println("> See Opponent Board -> see -ob");
         System.out.println("> Fire Missile -> fire <tile position>");

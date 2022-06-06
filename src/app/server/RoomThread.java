@@ -67,15 +67,15 @@ public class RoomThread extends Thread {
         	if (ship.isHitShip(pos)) {
         		ship.setShipCondition(pos, "X");
         		enemyBoard.setBoardConditionAt(pos, "H");
-        		sendMessage(createMessage("Your ship at " + pos + " has been hitted", "Server", enemy));
-        		sendMessage(createMessage("Your missile hits the enemy ship", "Server", attacker));
+        		sendMessage(createMessage("Your ship at " + pos + " has been hitted", "Server", enemy, ""));
+        		sendMessage(createMessage("Your missile hits the enemy ship", "Server", attacker, ""));
         		return;
         	}
         }
         
         enemyBoard.setBoardConditionAt(pos, "M");
-        sendMessage(createMessage("Enemy missile missed", "Server", enemy));
-        sendMessage(createMessage("Your missile missed", "Server", attacker));
+        sendMessage(createMessage("Enemy missile missed", "Server", enemy, ""));
+        sendMessage(createMessage("Your missile missed", "Server", attacker, ""));
         
 	}
 	
@@ -84,7 +84,7 @@ public class RoomThread extends Thread {
 			Ship newShip = new Ship(size, start, end);
 			this.ships.get(owner).add(newShip);
 		} catch (ShipNotValidException e) {
-			sendMessage(createMessage(e.getMessage(), "Server", owner));
+			sendMessage(createMessage(e.getMessage(), "Server", owner, ""));
 		}
 	}
 	
@@ -163,5 +163,20 @@ public class RoomThread extends Thread {
 		newMessage.setSender(sender);
 		newMessage.setReceiver(receiver);
 		return newMessage;
+	}
+	
+	public Message createMessage(String message, String sender, String receiver, String req) {
+		Message newMessage = new Message();
+		newMessage.setText(message);
+		newMessage.setSender(sender);
+		newMessage.setReceiver(receiver);
+		newMessage.setRequest(req);
+		return newMessage;
+	}
+	
+	public boolean isShipPlaced(String username) {
+		int s = 0, ms = 0, mb = 0, b = 0;
+		
+		
 	}
 }
