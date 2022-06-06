@@ -33,9 +33,23 @@ public class RoomThread extends Thread {
 		System.out.println("Buat Room");
 		WorkerThread newWt = new WorkerThread(this.socket, this);
 		newWt.start();
-		while (true) {
+		while (this.playerCount != 2 && !this.isGameReady()) {
 			
 		}
+		newWt.setReady(true);
+		
+	}
+	
+	public boolean isGameReady() {
+		Enumeration<String> usernames = players.keys();
+		while (usernames.hasMoreElements()) {
+			String username = usernames.nextElement();
+			if (!this.isShipPlaced(username)) {
+				return false;
+			}
+		}
+		
+		return true;
 	}
 	
 	public void attack(String attacker, String pos) {
@@ -69,6 +83,9 @@ public class RoomThread extends Thread {
         		enemyBoard.setBoardConditionAt(pos, "S");
         		sendMessage(createMessage("Your ship at " + pos + " has been hitted", "Server", enemy, ""));
         		sendMessage(createMessage("Your missile hits the enemy ship", "Server", attacker, ""));
+        		ship.checkCondition();
+        		checkWin();
+        		swapTurn(attacker);
         		return;
         	}
         }
@@ -76,7 +93,37 @@ public class RoomThread extends Thread {
         enemyBoard.setBoardConditionAt(pos, "M");
         sendMessage(createMessage("Enemy missile missed", "Server", enemy, ""));
         sendMessage(createMessage("Your missile missed", "Server", attacker, ""));
-        
+        swapTurn(attacker);
+	}
+	
+	public void swapTurn(String turnNow) {
+		this.players.get(turnNow).setReady(false);
+		this.players.get(this.getOpponentName(turnNow)).setReady(true);
+	}
+	
+	public void checkWin() {
+		// iterate through all players
+    	Enumeration<String> usernames = this.players.keys();
+        while (usernames.hasMoreElements()) {
+            String username = usernames.nextElement();
+
+            int destroyed = 0;
+            Iterator<Ship> shipIterator = this.ships.get(username).iterator();
+            while (shipIterator.hasNext()) {
+            	Ship ship = shipIterator.next();
+            	if (ship.isTotallyDestroyed()) {
+            		destroyed++;
+            	}
+            }
+            if (destroyed == 4) {
+            	this.winner = this.getOpponentName(username);
+            	sendMessage(createMessage("Congratulations! You win the game!", "Server", this.winner, ""));
+            	sendMessage(createMessage("Game Over! You lose", "Server", username, ""));
+            	this.setGameOver(true);
+            	this.players.get(username).setGameOver(true);
+            	this.players.get(this.winner).setGameOver(true);
+            }
+        }
 	}
 	
 	public void addShip(String owner, int size, String start, String end) {
@@ -223,7 +270,7 @@ public class RoomThread extends Thread {
 			}
 		}
 
-		if (b == 1 && mb == 1 && ms == 2 && s == 1) {
+		if (b == 1 && mb == 1 && ms == 1 && s == 1) {
 			return true;
 		} 
 		return false;
@@ -252,9 +299,9 @@ public class RoomThread extends Thread {
 			return true;
 		} else if (size == 4 && mb < 1) {
 			return true;
-		} else if (size == 3 && ms <2) {
+		} else if (size == 3 && ms < 1) {
 			return true;
-		} else if (size == 2 && s <1) {
+		} else if (size == 2 && s < 1) {
 			return true;
 		} 
 		throw new ShipNotValidException("This ship type has reached maximum amount allowed");

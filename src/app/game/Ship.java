@@ -23,6 +23,20 @@ public class Ship {
 		}
 	}
 	
+	public void checkCondition() {
+		Enumeration<String> tiles = this.shipCondition.keys();
+		int destroyed = 0;
+		while (tiles.hasMoreElements()) {
+			String tile = tiles.nextElement();
+			if (shipCondition.get(tile).equals("X")) {
+				destroyed++;
+			}
+		}
+		if (destroyed == this.size) {
+			this.setTotallyDestroyed(true);
+		}
+	}
+	
 	private void arrangeShipToBoard(String start) {
 		if (this.shipPositionType.equals("horizontal")) {
 			for (int i = 0 ; i < this.size ; i++) {

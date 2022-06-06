@@ -63,7 +63,7 @@ public class WorkerThread extends Thread {
 							rt.sendMessage(newMessage);
 						} else if (message.getRequest().split(" ")[1].equals("-ob")) {
 							String board = rt.getBoard(rt.getOpponentName(this.username)).toString();
-							board.replace("O", "U");
+							board = board.replace("O", "U");
 							Message newMessage = rt.createMessage(board, "Server", this.username);
 							newMessage.setRequest("");
 							rt.sendMessage(newMessage);
