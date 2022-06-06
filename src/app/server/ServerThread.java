@@ -33,11 +33,12 @@ public class ServerThread extends Thread {
                 socket = this.server.accept();
                 
                 if (rt != null && rt.getPlayerCount() != 2) {
-                	rt.createPlayer(new WorkerThread(socket, this));
+                	rt.createPlayer(new WorkerThread(socket, rt));
                 }
                 else {                	
-                	rt = new RoomThread(new WorkerThread(socket, this));
+                	rt = new RoomThread();
                 	rt.start();
+                	rt.createPlayer(new WorkerThread(socket, rt));
                 	this.roomList.add(rt);
                 	System.out.println("New Room Created");
                 }

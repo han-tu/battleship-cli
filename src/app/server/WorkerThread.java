@@ -11,16 +11,17 @@ public class WorkerThread {
 	private Socket socket;
     private ObjectOutputStream ous;
     private ObjectInputStream ois;
-    private ServerThread serverThread;
+    private RoomThread rt;
     private String username;
+    private boolean ready;
     private boolean gameOver;
     
-    public WorkerThread(Socket socket, ServerThread serverThread) {
+    public WorkerThread(Socket socket, RoomThread roomThread) {
         try {
             this.socket = socket;
             this.ous = new ObjectOutputStream(this.socket.getOutputStream());
             this.ois = new ObjectInputStream(this.socket.getInputStream());
-            this.serverThread = serverThread;
+            this.rt = roomThread;
             this.setGameOver(false);
         } catch (IOException e) {
             e.printStackTrace();
@@ -41,7 +42,28 @@ public class WorkerThread {
     		try {
 				Message message = (Message) this.ois.readObject();
 				// Code here
-				
+				String reqType = message.getRequest().split(" ")[0];
+				if (reqType.equals("send-message")) {
+					Message newMessage = rt.createMessage(message.getRequest().split(" ")[1], this.username, rt.getOpponentName(this.username));
+					newMessage.setRequest("Message");
+					rt.sendMessage(newMessage);
+				}
+				else if (reqType.equals("see")) {
+					if (message.getRequest().split(" ")[1].equals("-mb")) {
+						String board = rt.getBoard(this.username).toString();
+						Message newMessage = rt.createMessage(board, "Server", this.username);
+						rt.sendMessage(newMessage);
+					}
+					else if (message.getRequest().split(" ")[1].equals("-ob")) {
+						String board = rt.getBoard(rt.getOpponentName(this.username)).toString();
+						Message newMessage = rt.createMessage(board, "Server", this.username);
+						rt.sendMessage(newMessage);
+					}
+				}
+				else if (reqType.equals("fire")) {
+					String tile = message.getRequest().split(" ")[1];
+					rt.attack(this.username, tile);
+				}
 				
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
@@ -79,5 +101,13 @@ public class WorkerThread {
 
 	public void setGameOver(boolean gameOver) {
 		this.gameOver = gameOver;
+	}
+
+	public boolean isReady() {
+		return ready;
+	}
+
+	public void setReady(boolean ready) {
+		this.ready = ready;
 	}
 }

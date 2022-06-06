@@ -19,7 +19,7 @@ public class RoomThread extends Thread {
 	private boolean gameOver;
 	private String winner;
 	
-	public RoomThread(WorkerThread player1) {
+	public RoomThread() {
 		this.players = new Hashtable<String, WorkerThread>();
 		this.boards = new Hashtable<String, Board>();
 		this.ships = new Hashtable<String, Set<Ship>>();
@@ -85,17 +85,34 @@ public class RoomThread extends Thread {
             WorkerThread wt = this.players.get(username);
 
             // send the message to specified username
-            if(!wt.getUsername().equals(username)) {
+            if(wt.getUsername().equals(message.getReceiver())) {
             	wt.send(message);
             	break;
             }
         }
     }
 	
+	public String getOpponentName(String myUsername) {
+		// iterate through all players
+    	Enumeration<String> usernames = this.players.keys();
+        while (usernames.hasMoreElements()) {
+            String username = usernames.nextElement();
+
+            WorkerThread wt = this.players.get(username);
+
+            // send the message to specified username
+            if(!wt.getUsername().equals(myUsername)) {
+            	return wt.getUsername();
+            }
+        }
+        return null;
+	}
+	
 	public void createPlayer(WorkerThread player) {
 		players.put(player.getUsername(), player);
 		boards.put(player.getUsername(), new Board());
 		ships.put(player.getUsername(), new HashSet<Ship>());
+		this.playerCount += 1;
 	}
 	
 	public Set<Ship> getShips(String username) {
@@ -112,10 +129,6 @@ public class RoomThread extends Thread {
 
 	public int getPlayerCount() {
 		return playerCount;
-	}
-
-	public void setPlayerCount(int playerCount) {
-		this.playerCount = playerCount;
 	}
 
 	public String getWinner() {
