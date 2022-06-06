@@ -81,7 +81,7 @@ public class RoomThread extends Thread {
 	
 	public void addShip(String owner, int size, String start, String end) {
 		try {
-			Ship newShip = new Ship(size, start, end);
+			Ship newShip = new Ship(size, start, end);			
 			this.ships.get(owner).add(newShip);
 		} catch (ShipNotValidException e) {
 			sendMessage(createMessage(e.getMessage(), "Server", owner, ""));
@@ -197,5 +197,35 @@ public class RoomThread extends Thread {
 		} 
 		return false;
 
+	}
+	
+	public boolean isShipAvailable(String username, int size){
+		int s = 0, ms = 0, mb = 0, b = 0;
+
+		Set<Ship> ships = this.ships.get(username);
+		Iterator<Ship> shipIterator = ships.iterator();
+		while (shipIterator.hasNext()) {
+			Ship ship = shipIterator.next();
+			if (ship.getSize() == 5) {
+				b += 1;
+			} else if (ship.getSize() == 4) {
+				mb += 1;
+			} else if (ship.getSize() == 3) {
+				ms += 1;
+			} else if (ship.getSize() == 2) {
+				s += 1;
+			}
+		}
+		
+		if (size == 5 && b < 1) {
+			return true;
+		} else if (size == 4 && mb < 1) {
+			return true;
+		} else if (size == 3 && ms <2) {
+			return true;
+		} else if (size == 2 && s <1) {
+			return true;
+		} 
+		return false;
 	}
 }
