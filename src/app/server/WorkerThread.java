@@ -5,7 +5,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
-import app.exceptions.ShipNotValidException;
+import app.exceptions.CommandInvalidException;
 import app.game.Message;
 
 public class WorkerThread extends Thread {
@@ -63,6 +63,7 @@ public class WorkerThread extends Thread {
 							rt.sendMessage(newMessage);
 						} else if (message.getRequest().split(" ")[1].equals("-ob")) {
 							String board = rt.getBoard(rt.getOpponentName(this.username)).toString();
+							board.replace("O", "U");
 							Message newMessage = rt.createMessage(board, "Server", this.username);
 							newMessage.setRequest("");
 							rt.sendMessage(newMessage);
@@ -70,22 +71,23 @@ public class WorkerThread extends Thread {
 					} else if (reqType.equals("fire") && this.ready) {
 						String tile = message.getRequest().split(" ")[1];
 						rt.attack(this.username, tile);
-					} else if (!this.ready) {
-						Message newMessage = rt.createMessage("This is not your turn", "Server", this.username);
-						newMessage.setRequest("");
-						rt.sendMessage(newMessage);
-					}
-				} else if (reqType.equals("add-ship")) {
-					try {
+					} else if (reqType.equals("add-ship")) {
 						int size = Integer.parseInt(message.getRequest().split(" ")[1]);
 						String start = message.getRequest().split(" ")[2];
 						String end = message.getRequest().split(" ")[3];
 						rt.addShip(this.username, size, start, end);						
-					}
-					catch (ShipNotValidException e) {
-						Message newMessage = rt.createMessage(e.getMessage(), "Server", this.username, "");
+					} else if (!this.ready) {
+						Message newMessage = rt.createMessage("This is not your turn", "Server", this.username);
+						newMessage.setRequest("");
 						rt.sendMessage(newMessage);
+					} else {
+						throw new CommandInvalidException("Command Invalid");
 					}
+				} else if (reqType.equals("add-ship")) {
+					int size = Integer.parseInt(message.getRequest().split(" ")[1]);
+					String start = message.getRequest().split(" ")[2];
+					String end = message.getRequest().split(" ")[3];
+					rt.addShip(this.username, size, start, end);						
 				} else {
 					Message newMessage = rt.createMessage("Waiting for opponent", "Server", this.username);
 					newMessage.setRequest("");
@@ -96,6 +98,10 @@ public class WorkerThread extends Thread {
 			} catch (IOException e) {
 				System.out.println("Player \"" + this.username + "\" has been disconnected");
 				break;
+			} catch (CommandInvalidException e) {
+				Message newMessage = rt.createMessage("Command Invalid", "Server", this.username);
+				newMessage.setRequest("");
+				rt.sendMessage(newMessage);
 			}
     		
     	}

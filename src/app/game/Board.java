@@ -13,7 +13,7 @@ public class Board {
 	private void initBoardMap() {
 		for (int i = 65 ; i <= 70 ; i++) {
 			char vertical = (char) i;
-			for (int j = 1 ; j <= 10 ; j++) {
+			for (int j = 0 ; j < 10 ; j++) {
 				String pos = vertical + Integer.toString(j);
 				this.boardMap.put(pos, "U");
 			}
@@ -25,12 +25,12 @@ public class Board {
 	}
 	
 	public String toString() {
-		String board = "- 1 2 3 4 5 6 7 8 9 10\n";
+		String board = "- 0 1 2 3 4 5 6 7 8 9\n";
 		for (int i = 65 ; i <= 70 ; i++) {
 			char vertical = (char) i;
-			for (int j = 1 ; j <= 10 ; j++) {
+			for (int j = 0 ; j < 10 ; j++) {
 				String pos = vertical + Integer.toString(j);
-				if (j == 1)
+				if (j == 0)
 					board += vertical;
 				board += " ";
 				board += this.boardMap.get(pos);
