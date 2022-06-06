@@ -7,7 +7,7 @@ import java.net.Socket;
 
 import app.game.Message;
 
-public class WorkerThread {
+public class WorkerThread extends Thread {
 	private Socket socket;
     private ObjectOutputStream ous;
     private ObjectInputStream ois;
@@ -32,6 +32,7 @@ public class WorkerThread {
     	try {
 			Message firstMessage = (Message) this.ois.readObject();
 			this.setUsername(firstMessage.getText());
+			rt.createPlayer(this);
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -41,7 +42,14 @@ public class WorkerThread {
     	while(!this.isGameOver()) {
     		try {
 				Message message = (Message) this.ois.readObject();
-				// Code here
+				
+				
+				// Handling Room yang belum penuh
+				
+				/*
+				 * Code Here
+				 */
+				
 				String reqType = message.getRequest().split(" ")[0];
 				if (reqType.equals("send-message")) {
 					Message newMessage = rt.createMessage(message.getRequest().split(" ")[1], this.username, rt.getOpponentName(this.username));
@@ -52,11 +60,13 @@ public class WorkerThread {
 					if (message.getRequest().split(" ")[1].equals("-mb")) {
 						String board = rt.getBoard(this.username).toString();
 						Message newMessage = rt.createMessage(board, "Server", this.username);
+						newMessage.setRequest("");
 						rt.sendMessage(newMessage);
 					}
 					else if (message.getRequest().split(" ")[1].equals("-ob")) {
 						String board = rt.getBoard(rt.getOpponentName(this.username)).toString();
 						Message newMessage = rt.createMessage(board, "Server", this.username);
+						newMessage.setRequest("");
 						rt.sendMessage(newMessage);
 					}
 				}

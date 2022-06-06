@@ -23,7 +23,9 @@ public class WorkerThread extends Thread {
                     System.out.println("---End of Message---");
                 }
                 else if (message.getSender().equals("Server")) {
+                	System.out.println("You have new message from \"" + "Server" + "\"");
                 	System.out.println(message.getText());
+                	System.out.println("---End of Message---");
                 }
                 
             } catch (IOException e) {

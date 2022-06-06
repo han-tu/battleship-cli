@@ -1,5 +1,6 @@
 package app.server;
 
+import java.net.Socket;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -18,11 +19,23 @@ public class RoomThread extends Thread {
 	private int playerCount;
 	private boolean gameOver;
 	private String winner;
+	private Socket socket;
 	
-	public RoomThread() {
+	public RoomThread(Socket socket) {
 		this.players = new Hashtable<String, WorkerThread>();
 		this.boards = new Hashtable<String, Board>();
 		this.ships = new Hashtable<String, Set<Ship>>();
+		
+		this.socket = socket;
+	}
+	
+	public void run() {
+		System.out.println("Buat Room");
+		WorkerThread newWt = new WorkerThread(this.socket, this);
+		newWt.start();
+		while (true) {
+			
+		}
 	}
 	
 	public void attack(String attacker, String pos) {
@@ -113,6 +126,7 @@ public class RoomThread extends Thread {
 		boards.put(player.getUsername(), new Board());
 		ships.put(player.getUsername(), new HashSet<Ship>());
 		this.playerCount += 1;
+		System.out.println("Player with username: " + player.getUsername() + " has been joined");
 	}
 	
 	public Set<Ship> getShips(String username) {
@@ -145,6 +159,7 @@ public class RoomThread extends Thread {
 	
 	public Message createMessage(String message, String sender, String receiver) {
 		Message newMessage = new Message();
+		newMessage.setText(message);
 		newMessage.setSender(sender);
 		newMessage.setReceiver(receiver);
 		return newMessage;

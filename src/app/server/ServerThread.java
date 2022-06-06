@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.Set;
 
 public class ServerThread extends Thread {
@@ -32,13 +31,15 @@ public class ServerThread extends Thread {
                 // accept a new connection
                 socket = this.server.accept();
                 
+                // Disini kita bikin player nya
                 if (rt != null && rt.getPlayerCount() != 2) {
                 	rt.createPlayer(new WorkerThread(socket, rt));
                 }
+                // DIsini kita bikin room nya
                 else {                	
-                	rt = new RoomThread();
+                	rt = new RoomThread(socket);
                 	rt.start();
-                	rt.createPlayer(new WorkerThread(socket, rt));
+//                	rt.createPlayer(new WorkerThread(socket, rt));
                 	this.roomList.add(rt);
                 	System.out.println("New Room Created");
                 }

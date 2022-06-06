@@ -34,14 +34,15 @@ public class Client {
             ous.writeObject(firstMessage);
             ous.flush();
             
+            menu();
             while(status) {
-                System.out.println("---Request List Keyword (With CLI Command)---");
-                System.out.println("> Send Message -> send-message <message text>");
-                System.out.println("> See My Board -> see -mb");
-                System.out.println("> See Opponent Board -> see -ob");
-                System.out.println("> Fire Missile -> fire <tile position>");
-                System.out.println("Enter your request: \n>>");
+                
                 String req = reader.readLine();
+                
+                if(req.equals("help")) {
+                	menu();
+                	continue;
+                }
                 
                 Message message = new Message();
                 message.setSender(username);
@@ -58,6 +59,16 @@ public class Client {
         } catch (IOException ex) {
             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
         }
+	}
+	
+	public static void menu() {
+		System.out.println("---Request List Keyword (With CLI Command)---");
+        System.out.println("> Send Message -> send-message <message text>");
+        System.out.println("> See My Board -> see -mb");
+        System.out.println("> See Opponent Board -> see -ob");
+        System.out.println("> Fire Missile -> fire <tile position>");
+        System.out.println("> Help Menu -> help");
+        System.out.println("Enter your request: \n");
 	}
 
 }
