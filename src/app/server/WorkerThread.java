@@ -5,6 +5,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
+import app.exceptions.ShipNotValidException;
 import app.game.Message;
 
 public class WorkerThread extends Thread {
@@ -23,6 +24,7 @@ public class WorkerThread extends Thread {
 			this.ois = new ObjectInputStream(this.socket.getInputStream());
 			this.rt = roomThread;
 			this.setGameOver(false);
+			this.ready = false;
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -42,12 +44,12 @@ public class WorkerThread extends Thread {
 		while (!this.isGameOver()) {
 			try {
 				Message message = (Message) this.ois.readObject();
+				String reqType = message.getRequest().split(" ")[0];
 
 				// Handling Room yang belum penuh
 
 				if (rt.getPlayerCount() == 2) {
 
-					String reqType = message.getRequest().split(" ")[0];
 					if (reqType.equals("send-message")) {
 						Message newMessage = rt.createMessage(message.getRequest().split(" ")[1], this.username,
 								rt.getOpponentName(this.username));
@@ -65,9 +67,24 @@ public class WorkerThread extends Thread {
 							newMessage.setRequest("");
 							rt.sendMessage(newMessage);
 						}
-					} else if (reqType.equals("fire")) {
+					} else if (reqType.equals("fire") && this.ready) {
 						String tile = message.getRequest().split(" ")[1];
 						rt.attack(this.username, tile);
+					} else if (!this.ready) {
+						Message newMessage = rt.createMessage("This is not your turn", "Server", this.username);
+						newMessage.setRequest("");
+						rt.sendMessage(newMessage);
+					}
+				} else if (reqType.equals("add-ship")) {
+					try {
+						int size = Integer.parseInt(message.getRequest().split(" ")[1]);
+						String start = message.getRequest().split(" ")[2];
+						String end = message.getRequest().split(" ")[3];
+						rt.addShip(this.username, size, start, end);						
+					}
+					catch (ShipNotValidException e) {
+						Message newMessage = rt.createMessage(e.getMessage(), "Server", this.username, "");
+						rt.sendMessage(newMessage);
 					}
 				} else {
 					Message newMessage = rt.createMessage("Waiting for opponent", "Server", this.username);
