@@ -176,7 +176,26 @@ public class RoomThread extends Thread {
 	
 	public boolean isShipPlaced(String username) {
 		int s = 0, ms = 0, mb = 0, b = 0;
-		
-		
+
+		Set<Ship> ships = this.ships.get(username);
+		Iterator<Ship> shipIterator = ships.iterator();
+		while (shipIterator.hasNext()) {
+			Ship ship = shipIterator.next();
+			if (ship.getSize() == 5) {
+				b += 1;
+			} else if (ship.getSize() == 4) {
+				mb += 1;
+			} else if (ship.getSize() == 3) {
+				ms += 1;
+			} else if (ship.getSize() == 2) {
+				s += 1;
+			}
+		}
+
+		if (b == 1 && mb == 1 && ms == 2 && s == 1) {
+			return true;
+		} 
+		return false;
+
 	}
 }
