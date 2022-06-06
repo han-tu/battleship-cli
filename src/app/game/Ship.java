@@ -103,4 +103,11 @@ public class Ship {
 	public String getConditionAt(String pos) {
 		return this.shipCondition.get(pos);
 	}
+
+	public boolean isOutOfBoard(String start, String end) {
+		if (getHorizontal(start) < 0 || getHorizontal(start) > 9 || getVertical(start) < 65 || getVertical(start) > 74 || getHorizontal(end) < 0 || getHorizontal(end) > 9 || getVertical(end) < 65 || getVertical(end) > 74) {
+			return true;
+		}
+		return false;
+	}
 }

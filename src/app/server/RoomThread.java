@@ -81,8 +81,10 @@ public class RoomThread extends Thread {
 	
 	public void addShip(String owner, int size, String start, String end) {
 		try {
-			Ship newShip = new Ship(size, start, end);			
-			this.ships.get(owner).add(newShip);
+			Ship newShip = new Ship(size, start, end);
+			if (!isShipMissplaced(owner, newShip, start, end)) {
+				this.ships.get(owner).add(newShip);
+			}
 		} catch (ShipNotValidException e) {
 			sendMessage(createMessage(e.getMessage(), "Server", owner, ""));
 		}
@@ -226,6 +228,14 @@ public class RoomThread extends Thread {
 		} else if (size == 2 && s <1) {
 			return true;
 		} 
+		return false;
+	}
+
+	public boolean isShipMissplaced(String owner, Ship newShip, String start, String end) {
+		if (newShip.isOutOfBoard(start, end)) {
+			sendMessage(createMessage("Ship is out of board", "Server", owner, ""));
+			return true;
+		}
 		return false;
 	}
 }
